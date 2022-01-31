@@ -24,28 +24,11 @@
   </div>
   <div id="editor" v-show="state === 'editor'">
     <div id="styleType">
-      <button :style="styleB('blur')" @click="styleType = 'blur'">blur</button>
-      <button :style="styleB('brightness')" @click="styleType = 'brightness'">
-        brightness
-      </button>
-      <button :style="styleB('contrast')" @click="styleType = 'contrast'">
-        contrast
-      </button>
-      <button :style="styleB('grayscale')" @click="styleType = 'grayscale'">
-        grayscale
-      </button>
-      <button :style="styleB('hue-rotate')" @click="styleType = 'hue-rotate'">
-        hue-rotate
-      </button>
-      <button :style="styleB('opacity')" @click="styleType = 'opacity'">
-        opacity
-      </button>
-      <button :style="styleB('saturate')" @click="styleType = 'saturate'">
-        saturate
-      </button>
-      <button :style="styleB('sepia')" @click="styleType = 'sepia'">
-        sepia
-      </button>
+      <template v-for="type in types" :key="type">
+        <button :style="styleB(type)" @click="styleType = type">
+          {{ type }}
+        </button>
+      </template>
     </div>
     <input
       @change="inp"
@@ -56,38 +39,17 @@
       accept="image/*"
     />
     <img :style="{ filter: fil }" id="display_image" ref="display_image" />
-    <div v-show="styleType === 'grayscale'">
-      <input type="range" min="0" max="100" v-model="grayscale" />
-      <h2>{{ grayscale }}</h2>
-    </div>
-    <div v-show="styleType === 'blur'">
-      <input type="range" min="0" max="10" v-model="blur" />
-      <h2>{{ blur }}</h2>
-    </div>
-    <div v-show="styleType === 'brightness'">
-      <input type="range" min="0" max="100" v-model="brightness" />
-      <h2>{{ brightness }}</h2>
-    </div>
-    <div v-show="styleType === 'contrast'">
-      <input type="range" min="100" max="200" v-model="contrast" />
-      <h2>{{ contrast }}</h2>
-    </div>
-    <div v-show="styleType === 'hue-rotate'">
-      <input type="range" min="0" max="360" v-model="hueRotate" />
-      <h2>{{ hueRotate }}</h2>
-    </div>
-    <div v-show="styleType === 'opacity'">
-      <input type="range" min="0" max="100" v-model="opacity" />
-      <h2>{{ opacity }}</h2>
-    </div>
-    <div v-show="styleType === 'saturate'">
-      <input type="range" min="100" max="300" v-model="saturate" />
-      <h2>{{ saturate }}</h2>
-    </div>
-    <div v-show="styleType === 'sepia'">
-      <input type="range" min="0" max="100" v-model="sepia" />
-      <h2>{{ sepia }}</h2>
-    </div>
+    <template v-for="type in types" :key="type">
+      <div v-show="styleType === type">
+        <input
+          type="range"
+          :min="units[type][0]"
+          :max="units[type][1]"
+          v-model="units[type][2]"
+        />
+        <h2>{{ units[type][2] }}</h2>
+      </div>
+    </template>
     <button id="download" @click="download">Download</button>
   </div>
   <img
@@ -110,19 +72,31 @@ export default {
       imageType: "",
       state: "upload",
       styleType: "",
-      blur: 0,
-      brightness: 100,
-      contrast: 100,
-      grayscale: 0,
-      hueRotate: 0,
-      opacity: 100,
-      saturate: 100,
-      sepia: 0,
+      types: [
+        "grayscale",
+        "blur",
+        "brightness",
+        "contrast",
+        "hueRotate",
+        "opacity",
+        "saturate",
+        "sepia",
+      ],
+      units: {
+        grayscale: [0, 100, 0],
+        blur: [0, 100, 0],
+        brightness: [0, 100, 100],
+        contrast: [100, 200, 100],
+        hueRotate: [0, 360, 0],
+        opacity: [0, 100, 100],
+        saturate: [100, 300, 100],
+        sepia: [0, 100, 0],
+      },
     };
   },
   computed: {
     fil() {
-      return `brightness(${this.brightness}%) blur(${this.blur}px) contrast(${this.contrast}%) grayscale(${this.grayscale}%) hue-rotate(${this.hueRotate}deg) opacity(${this.opacity}%) saturate(${this.saturate}%) sepia(${this.sepia}%)`;
+      return `brightness(${this.units.brightness[2]}%) blur(${this.units.blur[2]}px) contrast(${this.units.contrast[2]}%) grayscale(${this.units.grayscale[2]}%) hue-rotate(${this.units.hueRotate[2]}deg) opacity(${this.units.opacity[2]}%) saturate(${this.units.saturate[2]}%) sepia(${this.units.sepia[2]}%)`;
     },
   },
   methods: {
@@ -214,14 +188,14 @@ export default {
       setTimeout(() => {
         this.state = "upload";
         this.styleType = "";
-        this.blur = 0;
-        this.brightness = 100;
-        this.contrast = 100;
-        this.grayscale = 0;
-        this.hueRotate = 0;
-        this.opacity = 100;
-        this.saturate = 100;
-        this.sepia = 0;
+        this.units.blur[2] = 0;
+        this.units.brightness[2] = 100;
+        this.units.contrast[2] = 100;
+        this.units.grayscale[2] = 0;
+        this.units.hueRotate[2] = 0;
+        this.units.opacity[2] = 100;
+        this.units.saturate[2] = 100;
+        this.units.sepia[2] = 0;
       }, 1000);
     },
   },
